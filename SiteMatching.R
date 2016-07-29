@@ -69,7 +69,7 @@ test[,1] <- table[test[,1],1]
 genelist <- list()
 for(i in 1:length(Genematching)){
   df <- data.frame(Genematching[i])
-  listdf[[i]] <- df
+  genelist[[i]] <- df
 }
 
 names(genelist) <- names(Gene)
