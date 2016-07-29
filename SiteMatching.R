@@ -74,12 +74,13 @@ for(i in 1:length(Genematching)){
 
 names(genelist) <- names(Gene)
 
-for(i in 1:length(listdf)){
-  listdf[[i]][2] <- NULL
-  colnames(listdf[[i]]) = c("enzyme", "start", "end", "width")
-  listdf[[i]][,1] <- table[listdf[[i]][,1],1]
+for(i in 1:length(genelist)){
+  genelist[[i]][2] <- NULL
+  colnames(genelist[[i]]) = c("enzyme", "start", "end", "width")
+  genelist[[i]][,1] <- table[genelist[[i]][,1],1]
 }
 
+test <- sapply()
 ###
 ###
 
