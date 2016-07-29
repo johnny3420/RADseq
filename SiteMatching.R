@@ -8,9 +8,6 @@ library(GenomicRanges)
 
 DNA <- readDNAStringSet("ChBrGSP/Brassica_napus_v4.1.chromosomes.fa.gz")
 testg <-readDNAStringSet("CHBrGSP/Brassica_napus.annotation_v5.gff3.cds.fa.gz")
-#Reading in Brassica gff file
-
-genome<- import("CHBrGSP/Brassica_napus.annotation_v5.gff3.gz")
 
 ###Preparing Pdict for Biostrings
 
