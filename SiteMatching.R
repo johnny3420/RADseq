@@ -12,13 +12,12 @@ Gene <-readDNAStringSet("CHBrGSP/Brassica_napus.annotation_v5.gff3.cds.fa.gz")
 
 ###Preparing Pdict for Biostrings
 
-sequence <- "ACCGGT,ACCGGT,RAATTY,GGATCC,GCTAGC,GGTCTC,TGTACA,CGGCCG,GAATTC,GAATTC,GATATC,AAGCTT,GGTACC,GGTACC,CAATTG,ACGCGT,CCATGG,GCTAGC,GCTAGC,TCGCGA,ATGCAT,CTGCAG,CGATCG,CAGCTG,GAGCTC,GTCGAC,GTCGAC,AGTACT,ACTAGT,GCATGC,AATATT,CCWWGG,TCTAGA,CTCGAG,GCGGCCGC,GCGGCCGC,TTAATTAA,CCTGCAGG,CACNNNGTG,GGTNACC"
-enzyme <- "AgeI-HF®,AgeI-HF® RE-Mix®,ApoI-HF,BamHI-HF®,BmtI-HF®,BsaI-HF®,BsrGI-HF®,EagI-HF®,EcoRI-HF®,EcoRI-HF® RE-Mix®,EcoRV-HF®,HindIII-HF®,KpnI-HF®,KpnI-HF® RE-Mix®,MfeI-HF®,MluI-HF®,NcoI-HF®,NheI-HF®,NheI-HF® RE-Mix®,NruI-HF®,NsiI-HF®,PstI-HF®,PvuI-HF®,PvuII-HF®,SacI-HF®,SalI-HF®,SalI-HF® RE-Mix®,ScaI-HF®,SpeI-HF®,SphI-HF®,SspI-HF®,StyI-HF®,XbaI RE-Mix®,XhoI RE-Mix®,NotI-HF®,NotI-HF® RE-Mix® ,PacI RE-Mix®,SbfI-HF®,DraIII-HF®,BstEII-HF®"
+sequence <- "ACCGGT,ACCGGT,GGATCC,GCTAGC,GGTCTC,TGTACA,CGGCCG,GAATTC,GAATTC,GATATC,AAGCTT,GGTACC,GGTACC,CAATTG,ACGCGT,CCATGG,GCTAGC,GCTAGC,TCGCGA,ATGCAT,CTGCAG,CGATCG,CAGCTG,GAGCTC,GTCGAC,GTCGAC,AGTACT,ACTAGT,GCATGC,AATATT,TCTAGA,CTCGAG,GCGGCCGC,GCGGCCGC,TTAATTAA,CCTGCAGG"
+enzyme <- "AgeI-HF®,AgeI-HF® RE-Mix®,BamHI-HF®,BmtI-HF®,BsaI-HF®,BsrGI-HF®,EagI-HF®,EcoRI-HF®,EcoRI-HF® RE-Mix®,EcoRV-HF®,HindIII-HF®,KpnI-HF®,KpnI-HF® RE-Mix®,MfeI-HF®,MluI-HF®,NcoI-HF®,NheI-HF®,NheI-HF® RE-Mix®,NruI-HF®,NsiI-HF®,PstI-HF®,PvuI-HF®,PvuII-HF®,SacI-HF®,SalI-HF®,SalI-HF® RE-Mix®,ScaI-HF®,SpeI-HF®,SphI-HF®,SspI-HF®,XbaI RE-Mix®,XhoI RE-Mix®,NotI-HF®,NotI-HF® RE-Mix® ,PacI RE-Mix®,SbfI-HF®"
 name1 <- strsplit(enzyme, ",")
 name2 <- strsplit(sequence, ",")
 table <- cbind.data.frame(enzyme = name1, sequence =name2)
 colnames(table) <- c("enzyme", "sequence")
-table <- table[c(-3,-32,-39,-40),] #Removing enzymes with ambiguity codes
 pdict <- as.character(table[,2])
 names(pdict) <- table[,1]
 pdict <- DNAStringSet(pdict)
