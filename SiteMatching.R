@@ -64,7 +64,7 @@ test$group <- table[test$group,1]
 test[,1] <- table[test[,1],1]
 
 ###Creates a list of data frames of each gene and the enzymes
-###which cut it and where
+###which cut it and where. If an enzyme cuts more than once, each cut is listed.
 ###
 genelist <- list()
 for(i in 1:length(Genematching)){
@@ -74,13 +74,17 @@ for(i in 1:length(Genematching)){
 
 names(genelist) <- names(Gene)
 
+##Cleaning up the data frames
 for(i in 1:length(genelist)){
   genelist[[i]][2] <- NULL
   colnames(genelist[[i]]) = c("enzyme", "start", "end", "width")
   genelist[[i]][,1] <- table[genelist[[i]][,1],1]
 }
 
-test <- sapply()
+## Applying the confirmed correct enzyme names to data frames
+for(i in 1:length(genelist)){
+  genelist[[i]][,1] <- table[genelist[[i]][,1],1]
+}
 ###
 ###
 
