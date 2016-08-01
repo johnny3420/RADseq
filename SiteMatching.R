@@ -48,6 +48,36 @@ DNAmatching <- lapply(1:41, function(s) {
 })
 names(DNAmatching) <- names(DNA) ## Puts names on each chromosome.
 
+###Creates list of data frames of each chromosome and the enzymes which cut there.
+
+dnalist<- list()
+for(i in 1:length(DNAmatching)){
+  df <- data.frame(DNAmatching[i])
+  dnalist[[i]] <- df
+}
+names(dnalist) <- names(DNA)
+
+###Cleaning up dataframes
+
+for(i in 1:length(dnalist)){
+  dnalist[[i]][2] <- NULL
+  colnames(dnalist[[i]]) = c("enzyme", "start", "end", "width")
+  dnalist[[i]][,1] <- table[dnalist[[i]][,1],1]
+}
+
+### Counting number of cuts of each restriction enzyme on each gene in annotated genome
+
+Genecounting <- lapply(1:101040, function(s) {
+  countPDict(pdict, Gene[[s]])
+})
+
+names(Genecounting)<- names(Gene)
+
+### Putting results in dataframe
+
+Genecount.table <- data.frame(Genecounting, row.names = table[,1])
+Genecount.table$totalcuts <- rowSums(Genecount.table)
+Genecount.table$roughfraglen <- 1300000000/Genecount.table$totalcuts
 
 ### Identifies the location of each restriction site for each gene in the annotated genome.
 Genematching <-lapply(1:length(Gene), function(s) {
@@ -80,16 +110,52 @@ for(i in 1:length(genelist)){
   genelist[[i]][,1] <- table[genelist[[i]][,1],1]
 }
 
-## Applying the confirmed correct enzyme names to data frames
-for(i in 1:length(genelist)){
-  genelist[[i]][,1] <- table[genelist[[i]][,1],1]
-}
 ###
-###
+### Table of cuts for each RE on genes
 
 cuts_per_gene <- sapply(genelist, function(x) table(x$enzyme))
 
 cuts_all_genes <- rowSums(cuts_per_gene)
 
 cuts_all_genes
+
+### Table of cuts for each RE on chromosomes
+### NUMBER IS INFLATED I THINK. DNA SEQUENCES CONTAIN
+### 41 NAMED CHROMOSOMES AND REPEATS ARE MOST LIKELY PRESENT
+### NEED TO SUBSET "dnalist" BASED ON WHICH COLLECTION OF 
+### CHROMOSOMES IS CHOSEN
+
+cuts_per_chromosome <- sapply(dnalist, function(x) table(x$enzyme))
+
+cuts_all_chromosomes <- rowSums(cuts_per_chromosome)
+
+cuts_all_chromosomes
+
+### Data frame comparing cut comparisons
+
+cut_comparison <- cbind.data.frame(whole = cuts_all_chromosomes, genes = cuts_all_genes)
+
+cut_comparison
+
+cut_comparison$whole2gene <- cut_comparison$whole/cut_comparison$genes
+cut_comparison$gene2whole <- cut_comparison$gene/cut_comparison$whole
+cut_comparison$rough_frag_length <- 1300000000/cut_comparison$whole
+
+### Prices of RE
+
+units <- c(300, 0, 10000, 300, 1000, 1000, 500, 10000, 0, 4000, 10000, 4000, 0, 500, 1000, 1000, 1000, 0, 500, 0, 1000, 1000, 0, 10000, 500, 5000, 2000, 2000, 0, 500, 1000, 500, 500, 1000, 0, 0)
+bulk_units <- c(1500, 0, 50000, 1500, 5000, 5000, 2500, 50000, 0, 20000, 50000, 2000, 0, 2500, 5000, 5000, 5000, 0, 2500, 0, 5000, 5000, 0, 50000, 2500, 25000, 10000, 10000, 0, 2500, 5000, 2500, 2500, 5000, 0, 0)
+price <- c(69, 0, 57, 65, 65, 65, 62, 57, 0, 57, 57, 62, 0, 70, 62, 60, 65, 0, 70, 0, 57, 62, 0, 62, 69, 57, 57, 60, 0, 70, 62, 65, 65, 67, 0, 0)
+bulk_price <- c(278, 0, 229, 262, 262, 262, 249, 229, 0, 229, 229, 249, 0, 282, 249, 241, 262, 0, 282, 0, 229, 249, 0, 249, 278, 229, 229, 241, 0, 282, 249, 262, 262, 270, 0, 0)
+
+cut_comparison$units <- units
+cut_comparison$price <- price
+cut_comparison$units_per_dollar <- units/price
+cut_comparison$bulk_units <- bulk_units
+cut_comparison$bulk_price <- bulk_price
+cut_comparison$bulk_units_per_dollar <- bulk_units/bulk_price
+
+cut_comparison
+
+###
 
