@@ -1,4 +1,4 @@
-### ScaI fragments produced by cutting the Brassica Napus genome
+### SacI fragments produced by cutting the Brassica Napus genome
 library(Biostrings)
 
 ### Loading in genome
@@ -61,7 +61,7 @@ for(i in 1:length(chromolist)){
 ### Take that stringset and turn into FASTQ file
 
 test <- character(0) ### create string
-test <- paste(DNA[[i]][start:end]) ### format for getting needed sequence string
+test <- as.character(subseq(DNA[[i]],start,end)) ### format for getting needed sequence string
 test <- c(test, "") ### Appending string
 test <- DNAStringSet(test) ### converting string into DNAStringSet
 writeXStringSet(test,"", format = "fastq") ### Creating fastq file
@@ -70,64 +70,65 @@ writeXStringSet(test,"", format = "fastq") ### Creating fastq file
 ### Very slow process
 
 fifty <- character(0)
+system.time({
 for(i in 1){
   k <- 1
   while(k <= nrow(chromolist$chrA01)){
     if(((chromolist[[1]][k+1,3] == TRUE)) & (k == 1)){
       start <- chromolist[[1]][k,2]-49
       end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty,seq)
       start <- chromolist[[1]][k,1]
       end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty, seq)
       k <- k +1
     } else if(((chromolist[[1]][k+1,3] == FALSE)) & (k == 1)){
       start <- chromolist[[1]][k,2]-49
       end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty,seq)             
       k <- k + 1
     } else if((k == nrow(chromolist[[1]])) & (chromolist[[1]][k,3] == TRUE)){
       start <- chromolist[[1]][k,2]-49
       end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty,seq)
       start <- chromolist[[1]][k,1]
       end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty,seq)
       k <- k + 1
     } else if((k == nrow(chromolist[[1]])) & (chromolist[[1]][k,3] == FALSE)){
       start <- chromolist[[1]][k,1]
       end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty,seq)
       k <- k + 1
     } else if((chromolist[[1]][k,3] == TRUE) & (chromolist[[1]][k+1,3] == FALSE)
               & k != 1 & k != nrow(chromolist[[1]])){
       start <- chromolist[[1]][k,2]-49
       end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty,seq)
       k <- k + 1
     } else if((chromolist[[1]][k,3] == FALSE) & (chromolist[[1]][k+1,3] == TRUE)
               & k != 1 & k != nrow(chromolist[[1]])){
       start <- chromolist[[1]][k,1]
       end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty,seq)
       k <- k + 1
     } else if((chromolist[[1]][k,3] == TRUE) & (chromolist[[1]][k+1,3] == TRUE)
               & k != 1 & k != nrow(chromolist[[1]])){
       start <- chromolist[[1]][k,2]-49
       end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty,seq)
       start <- chromolist[[1]][k,1]
       end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
+      seq <- as.character(subseq(DNA[[1]],start,end))
       fifty <- c(fifty,seq)
       k <- k + 1
     } else if((chromolist[[1]][k,3] == FALSE) & (chromolist[[1]][k+1,3] == FALSE)
@@ -135,7 +136,7 @@ for(i in 1){
       k <- k + 1
     }
   }
-}
+}})
 
 test <- DNAStringSet(fifty)
 names(test) <- 1:length(test)
@@ -144,79 +145,82 @@ writeXStringSet(test, "chromo1.fq", format ="fastq")
 check <- readDNAStringSet("chromo1.fq", format = "fastq")
 check
 
-### 50bp FASTQ creation
+### 50bp FASTQ creation. Takes about 13 mins
 
 fifty <- character(0)
-for(i in 1:length(chromolist)){
-  k <- 1
-  while(k <= nrow(chromolist[[i]])){
-    if(((chromolist[[i]][k+1,3] == TRUE)) & (k == 1)){
-      start <- chromolist[[i]][k,2]-49
-      end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty,seq)
-      start <- chromolist[[i]][k,1]
-      end <- chromolist[[i]][k,1]+49
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty, seq)
-      k <- k +1
-    } else if(((chromolist[[i]][k+1,3] == FALSE)) & (k == 1)){
-      start <- chromolist[[i]][k,2]-49
-      end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty,seq)             
-      k <- k + 1
-    } else if((k == nrow(chromolist[[i]])) & (chromolist[[i]][k,3] == TRUE)){
-      start <- chromolist[[i]][k,2]-49
-      end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty,seq)
-      start <- chromolist[[i]][k,1]
-      end <- chromolist[[i]][k,1]+49
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((k == nrow(chromolist[[i]])) & (chromolist[[i]][k,3] == FALSE)){
-      start <- chromolist[[i]][k,1]
-      end <- chromolist[[i]][k,1]+49
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((chromolist[[i]][k,3] == TRUE) & (chromolist[[i]][k+1,3] == FALSE)
-              & k != 1 & k != nrow(chromolist[[i]])){
-      start <- chromolist[[i]][k,2]-49
-      end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((chromolist[[i]][k,3] == FALSE) & (chromolist[[i]][k+1,3] == TRUE)
-              & k != 1 & k != nrow(chromolist[[i]])){
-      start <- chromolist[[i]][k,1]
-      end <- chromolist[[i]][k,1]+49
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((chromolist[[i]][k,3] == TRUE) & (chromolist[[i]][k+1,3] == TRUE)
-              & k != 1 & k != nrow(chromolist[[i]])){
-      start <- chromolist[[i]][k,2]-49
-      end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty,seq)
-      start <- chromolist[[i]][k,1]
-      end <- chromolist[[i]][k,1]+49
-      seq <- paste(DNA[[i]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((chromolist[[i]][k,3] == FALSE) & (chromolist[[i]][k+1,3] == FALSE)
-              & k != 1 & k != nrow(chromolist[[i]])){
-      k <- k + 1
+
+system.time({
+  for(i in 1:length(chromolist)){
+    k <- 1
+    while(k <= nrow(chromolist[[i]])){
+      if(((chromolist[[i]][k+1,3] == TRUE)) & (k == 1)){
+        start <- chromolist[[i]][k,2]-49
+        end <- chromolist[[i]][k,2]
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty,seq)
+        start <- chromolist[[i]][k,1]
+        end <- chromolist[[i]][k,1]+49
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty, seq)
+        k <- k +1
+      } else if(((chromolist[[i]][k+1,3] == FALSE)) & (k == 1)){
+        start <- chromolist[[i]][k,2]-49
+        end <- chromolist[[i]][k,2]
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty,seq)             
+        k <- k + 1
+      } else if((k == nrow(chromolist[[i]])) & (chromolist[[i]][k,3] == TRUE)){
+        start <- chromolist[[i]][k,2]-49
+        end <- chromolist[[i]][k,2]
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty,seq)
+        start <- chromolist[[i]][k,1]
+        end <- chromolist[[i]][k,1]+49
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((k == nrow(chromolist[[i]])) & (chromolist[[i]][k,3] == FALSE)){
+        start <- chromolist[[i]][k,1]
+        end <- chromolist[[i]][k,1]+49
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((chromolist[[i]][k,3] == TRUE) & (chromolist[[i]][k+1,3] == FALSE)
+                & k != 1 & k != nrow(chromolist[[i]])){
+        start <- chromolist[[i]][k,2]-49
+        end <- chromolist[[i]][k,2]
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((chromolist[[i]][k,3] == FALSE) & (chromolist[[i]][k+1,3] == TRUE)
+                & k != 1 & k != nrow(chromolist[[i]])){
+        start <- chromolist[[i]][k,1]
+        end <- chromolist[[i]][k,1]+49
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((chromolist[[i]][k,3] == TRUE) & (chromolist[[i]][k+1,3] == TRUE)
+                & k != 1 & k != nrow(chromolist[[i]])){
+        start <- chromolist[[i]][k,2]-49
+        end <- chromolist[[i]][k,2]
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty,seq)
+        start <- chromolist[[i]][k,1]
+        end <- chromolist[[i]][k,1]+49
+        seq <- as.character(subseq(DNA[[i]],start,end))
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((chromolist[[i]][k,3] == FALSE) & (chromolist[[i]][k+1,3] == FALSE)
+                & k != 1 & k != nrow(chromolist[[i]])){
+        k <- k + 1
+      }
     }
   }
-}
-
+})
 fastq50 <- DNAStringSet(fifty)
 names(fastq50) <- 1:length(fastq50)
 writeXStringSet(fastq50, "50bp.fq")
+
 
 ### 100bp FASTQ creation
 
@@ -227,58 +231,58 @@ for(i in 1:length(chromolist)){
     if(((chromolist[[i]][k+1,3] == TRUE)) & (k == 1)){
       start <- chromolist[[i]][k,2]-99
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred,seq)
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+99
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred, seq)
       k <- k +1
     } else if(((chromolist[[i]][k+1,3] == FALSE)) & (k == 1)){
       start <- chromolist[[i]][k,2]-99
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred,seq)             
       k <- k + 1
     } else if((k == nrow(chromolist[[i]])) & (chromolist[[i]][k,3] == TRUE)){
       start <- chromolist[[i]][k,2]-99
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred,seq)
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+99
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred,seq)
       k <- k + 1
     } else if((k == nrow(chromolist[[i]])) & (chromolist[[i]][k,3] == FALSE)){
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+99
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred,seq)
       k <- k + 1
     } else if((chromolist[[i]][k,3] == TRUE) & (chromolist[[i]][k+1,3] == FALSE)
               & k != 1 & k != nrow(chromolist[[i]])){
       start <- chromolist[[i]][k,2]-99
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred,seq)
       k <- k + 1
     } else if((chromolist[[i]][k,3] == FALSE) & (chromolist[[i]][k+1,3] == TRUE)
               & k != 1 & k != nrow(chromolist[[i]])){
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+99
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred,seq)
       k <- k + 1
     } else if((chromolist[[i]][k,3] == TRUE) & (chromolist[[i]][k+1,3] == TRUE)
               & k != 1 & k != nrow(chromolist[[i]])){
       start <- chromolist[[i]][k,2]-99
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred,seq)
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+99
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       hundred <- c(hundred,seq)
       k <- k + 1
     } else if((chromolist[[i]][k,3] == FALSE) & (chromolist[[i]][k+1,3] == FALSE)
@@ -294,6 +298,9 @@ writeXStringSet(fastq100, "100bp.fq")
 
 
 ### 150bp FASTQ creation
+### Error is thrown because chrC09_random has a cut site less than 150bp from end of chromosome
+### Extracted the upstream sequence to add later then removed cut site from data frame
+chromolist$chrC09_random <- chromolist$chrC09_random[-880,]
 
 onefifty <- character(0)
 for(i in 1:length(chromolist)){
@@ -302,58 +309,58 @@ for(i in 1:length(chromolist)){
     if(((chromolist[[i]][k+1,3] == TRUE)) & (k == 1)){
       start <- chromolist[[i]][k,2]-149
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty,seq)
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+149
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty, seq)
       k <- k +1
     } else if(((chromolist[[i]][k+1,3] == FALSE)) & (k == 1)){
       start <- chromolist[[i]][k,2]-149
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty,seq)             
       k <- k + 1
     } else if((k == nrow(chromolist[[i]])) & (chromolist[[i]][k,3] == TRUE)){
       start <- chromolist[[i]][k,2]-149
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty,seq)
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+149
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty,seq)
       k <- k + 1
     } else if((k == nrow(chromolist[[i]])) & (chromolist[[i]][k,3] == FALSE)){
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+149
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty,seq)
       k <- k + 1
     } else if((chromolist[[i]][k,3] == TRUE) & (chromolist[[i]][k+1,3] == FALSE)
               & k != 1 & k != nrow(chromolist[[i]])){
       start <- chromolist[[i]][k,2]-149
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty,seq)
       k <- k + 1
     } else if((chromolist[[i]][k,3] == FALSE) & (chromolist[[i]][k+1,3] == TRUE)
               & k != 1 & k != nrow(chromolist[[i]])){
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+149
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty,seq)
       k <- k + 1
     } else if((chromolist[[i]][k,3] == TRUE) & (chromolist[[i]][k+1,3] == TRUE)
               & k != 1 & k != nrow(chromolist[[i]])){
       start <- chromolist[[i]][k,2]-149
       end <- chromolist[[i]][k,2]
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty,seq)
       start <- chromolist[[i]][k,1]
       end <- chromolist[[i]][k,1]+149
-      seq <- paste(DNA[[i]][start:end])
+      seq <- as.character(subseq(DNA[[i]],start,end))
       onefifty <- c(onefifty,seq)
       k <- k + 1
     } else if((chromolist[[i]][k,3] == FALSE) & (chromolist[[i]][k+1,3] == FALSE)
@@ -363,10 +370,11 @@ for(i in 1:length(chromolist)){
   }
 }
 
+###Add extracted sequence from removed site
+onefifty <- c(onefifty,"GAAGACGGTTTGGCGCACAGTATCGGGAAATTTGACGGTACAGATTATGCATTTTGGAGAATGGAAATTGAAGATTATCTGTACGGAAAGAAGCTTCATCAACCGCTGAGCAAGAAGCCTGAGAAGATGGATCAGGATGAGTGGGAGCTC")
 fastq150 <- DNAStringSet(onefifty)
 names(fastq150) <- 1:length(fastq150)
 writeXStringSet(fastq150, "150bp.fq")
 
-
-
 ###
+
