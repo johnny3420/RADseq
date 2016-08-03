@@ -3,7 +3,11 @@ library(Biostrings)
 
 ### Loading in genome
 
-DNA <- readDNAStringSet("ChBrGSP/Brassica_napus_v4.1.chromosomes.fa.gz")
+if(Sys.getenv("USER")=="jmaloof") {
+  DNA <- readDNAStringSet("~/Sequences/ref_genomes/B_napus/Brassica_napus_v4.1.chromosomes.fa.gz")
+} else {
+  DNA <- readDNAStringSet("ChBrGSP/Brassica_napus_v4.1.chromosomes.fa.gz")
+}
 
 ### Preparing PDict for matching
 
@@ -41,6 +45,7 @@ for(i in 1:length(chromolist)){
 ### Test to see if any sites are within 200 bp of eachother on each chromosome
 ### TRUE == minimum gap achieved, FALSE == minimum gap failed
 
+
 for(i in 1:length(chromolist)){
   for(k in 1:nrow(chromolist[[i]])){
     if(k == 1){
@@ -55,7 +60,7 @@ for(i in 1:length(chromolist)){
   
 }
 
-### Overall though process
+### Overall thought process
 ### Create a very long string composed of each read
 ### Take that string and turn into DNAStringSet
 ### Take that string set and turn into FASTQ file
@@ -69,73 +74,95 @@ writeXStringSet(test,"", format = "fastq") ### Creating fastq file
 ### Successful test on chromosome chrA01 for all acceptable 50 bp reads being written to FASTQ file
 ### Very slow process
 
-fifty <- character(0)
-for(i in 1){
-  k <- 1
-  while(k <= nrow(chromolist$chrA01)){
-    if(((chromolist[[1]][k+1,3] == TRUE)) & (k == 1)){
-      start <- chromolist[[1]][k,2]-49
-      end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty,seq)
-      start <- chromolist[[1]][k,1]
-      end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty, seq)
-      k <- k +1
-    } else if(((chromolist[[1]][k+1,3] == FALSE)) & (k == 1)){
-      start <- chromolist[[1]][k,2]-49
-      end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty,seq)             
-      k <- k + 1
-    } else if((k == nrow(chromolist[[1]])) & (chromolist[[1]][k,3] == TRUE)){
-      start <- chromolist[[1]][k,2]-49
-      end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty,seq)
-      start <- chromolist[[1]][k,1]
-      end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((k == nrow(chromolist[[1]])) & (chromolist[[1]][k,3] == FALSE)){
-      start <- chromolist[[1]][k,1]
-      end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((chromolist[[1]][k,3] == TRUE) & (chromolist[[1]][k+1,3] == FALSE)
-              & k != 1 & k != nrow(chromolist[[1]])){
-      start <- chromolist[[1]][k,2]-49
-      end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((chromolist[[1]][k,3] == FALSE) & (chromolist[[1]][k+1,3] == TRUE)
-              & k != 1 & k != nrow(chromolist[[1]])){
-      start <- chromolist[[1]][k,1]
-      end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((chromolist[[1]][k,3] == TRUE) & (chromolist[[1]][k+1,3] == TRUE)
-              & k != 1 & k != nrow(chromolist[[1]])){
-      start <- chromolist[[1]][k,2]-49
-      end <- chromolist[[1]][k,2]
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty,seq)
-      start <- chromolist[[1]][k,1]
-      end <- chromolist[[1]][k,1]+49
-      seq <- paste(DNA[[1]][start:end])
-      fifty <- c(fifty,seq)
-      k <- k + 1
-    } else if((chromolist[[1]][k,3] == FALSE) & (chromolist[[1]][k+1,3] == FALSE)
-              & k != 1 & k != nrow(chromolist[[1]])){
-      k <- k + 1
+system.time({
+  test <-  sapply(2:nrow(chromolist$chrA01), function(k) {
+    frag1 <- NA
+    frag2 <- NA
+    if(chromolist$chrA01[k-1,"test"]) { #get 5-prime fragment
+      start <- chromolist$chrA01[k,"end"] -49
+      end <- chromolist$chrA01[k,"end"]
+      frag1 <- as.character(subseq(DNA[[1]],start,end))
     }
-  }
-}
+    if(chromolist$chrA01[k,"test"]) { #get 3-prime fragment
+      start <- chromolist$chrA01[k,"start"] 
+      end <- chromolist$chrA01[k,"start"] + 49
+      frag2 <- as.character(subseq(DNA[[1]],start,end))
+    } 
+    c(frag1,frag2)
+  } )
+  
+  test <- c(test[1,],test[2,])}
+)
+## still need to deal with first and last row
+
+fifty <- character(0)
+system.time(
+  for(i in 1){
+    k <- 1
+     while(k <= nrow(chromolist$chrA01)){
+      if(((chromolist[[1]][k+1,3] == TRUE)) & (k == 1)){
+        start <- chromolist[[1]][k,2]-49
+        end <- chromolist[[1]][k,2]
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty,seq)
+        start <- chromolist[[1]][k,1]
+        end <- chromolist[[1]][k,1]+49
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty, seq)
+        k <- k +1
+      } else if(((chromolist[[1]][k+1,3] == FALSE)) & (k == 1)){
+        start <- chromolist[[1]][k,2]-49
+        end <- chromolist[[1]][k,2]
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty,seq)             
+        k <- k + 1
+      } else if((k == nrow(chromolist[[1]])) & (chromolist[[1]][k,3] == TRUE)){
+        start <- chromolist[[1]][k,2]-49
+        end <- chromolist[[1]][k,2]
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty,seq)
+        start <- chromolist[[1]][k,1]
+        end <- chromolist[[1]][k,1]+49
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((k == nrow(chromolist[[1]])) & (chromolist[[1]][k,3] == FALSE)){
+        start <- chromolist[[1]][k,1]
+        end <- chromolist[[1]][k,1]+49
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((chromolist[[1]][k,3] == TRUE) & (chromolist[[1]][k+1,3] == FALSE)
+                & k != 1 & k != nrow(chromolist[[1]])){
+        start <- chromolist[[1]][k,2]-49
+        end <- chromolist[[1]][k,2]
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((chromolist[[1]][k,3] == FALSE) & (chromolist[[1]][k+1,3] == TRUE)
+                & k != 1 & k != nrow(chromolist[[1]])){
+        start <- chromolist[[1]][k,1]
+        end <- chromolist[[1]][k,1]+49
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((chromolist[[1]][k,3] == TRUE) & (chromolist[[1]][k+1,3] == TRUE)
+                & k != 1 & k != nrow(chromolist[[1]])){
+        start <- chromolist[[1]][k,2]-49
+        end <- chromolist[[1]][k,2]
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty,seq)
+        start <- chromolist[[1]][k,1]
+        end <- chromolist[[1]][k,1]+49
+        seq <- paste(DNA[[1]][start:end])
+        fifty <- c(fifty,seq)
+        k <- k + 1
+      } else if((chromolist[[1]][k,3] == FALSE) & (chromolist[[1]][k+1,3] == FALSE)
+                & k != 1 & k != nrow(chromolist[[1]])){
+        k <- k + 1
+      }
+    }
+  })
 
 test <- DNAStringSet(fifty)
 names(test) <- 1:length(test)
