@@ -1,5 +1,6 @@
 library(Rsamtools)
 library(stringr)
+library(plyr)
 ### Creating bam files and indexes from sam files
 ### Only needs to be ran if files not present
 ### Won't run if files already exist
@@ -43,42 +44,59 @@ multi_df_50 <- subset(df_50, is.na(df_50$XA)!= TRUE)
 multi_df_100 <-subset(df_100, is.na(df_100$XA)!= TRUE)
 multi_df_150 <-subset(df_150, is.na(df_150$XA)!= TRUE)
 
-### Splitting XA column for all 3 sets and place into new data frames
+### Isolating ED of each multiple mapping read
 
 XA50 <- as.character(unlist(multi_df_50$XA))
-XA50 <- sub(".*,","",XA50)
-XA50 <- data.frame(as.numeric(sub(";","",XA50)))
+XA50 <- (str_split(XA50, ";"))
+XA50 <- sapply(XA50, function(x) as.numeric(gsub(".*,","",x)))
+for(i in 1:length(XA50)){
+  XA50[[i]] <- XA50[[i]][1:(length(XA50[[i]])-1)]
+}
+XA50 <- ldply(XA50, rbind)
+
 XA100 <- as.character(unlist(multi_df_100$XA))
-XA100 <- sub(".*,","",XA100)
-XA100 <- data.frame(as.numeric(sub(";","",XA100)))
+XA100 <- (str_split(XA100, ";"))
+XA100 <- sapply(XA100, function(x) as.numeric(gsub(".*,","",x)))
+for(i in 1:length(XA100)){
+  XA100[[i]] <- XA100[[i]][1:(length(XA100[[i]])-1)]
+}
+XA100 <- ldply(XA100, rbind)
+
 XA150 <- as.character(unlist(multi_df_150$XA))
-XA150 <- sub(".*,","",XA150)
-XA150 <- data.frame(as.numeric(sub(";","",XA150)))
+XA150 <- (str_split(XA150, ";"))
+XA150 <- sapply(XA150, function(x) as.numeric(gsub(".*,","",x)))
+for(i in 1:length(XA150)){
+  XA150[[i]] <- XA150[[i]][1:(length(XA150[[i]])-1)]
+}
+XA150 <- ldply(XA150, rbind)
 
-### Looking at 50bp Alternatives
+### Creating new data table with ED for each alternative site for each read
 
-sapply(0:max(XA50), function(k){
-  if(k == 0){
-    paste("Of multiple mapping reads,", round(sum(XA50 == k)/nrow(XA50)*100, digit = 3), "percent are an exact match")
-  }else
-    paste("Of multiple mapping reads,", round(sum(XA50 == k)/nrow(XA50)*100, digit = 3), "percent have an Edit Distance of", k)
-})
+stretch50 <- cbind(multi_df_50, XA50)
+stretch100 <- cbind(multi_df_100, XA100)
+stretch150 <- cbind(multi_df_150,XA150)
 
-### Looking at 100bp Alternatives
 
-sapply(0:max(XA100), function(k){
-  if(k == 0){
-    paste("Of multiple mapping reads,", round(sum(XA100 == k)/nrow(XA50)*100, digit = 3), "percent are an exact match")
-  }else
-    paste("Of multiple mapping reads,", round(sum(XA100 == k)/nrow(XA50)*100, digit = 3), "percent have an Edit Distance of", k)
-})
+### Percentage of multiple site reads with exact match alternative hits
 
-### Looking at 150bp Alternatives
+exact <- nrow(stretch50[which(stretch50$`1` == 0 | stretch50$`2` == 0 
+                               | stretch50$`3` == 0 | stretch50$`4` == 0 
+                               | stretch50$`5` == 0), ])
+paste("Of all 50bp reads", round(exact/nrow(df_50)*100, 3), "percent map to at least 2 sites exactly")
+paste("Of all 50bp multiple mapping reads", round(exact/nrow(multi_df_50)*100, 3), "percent have at least one exact alternate hit")
 
-sapply(0:max(XA150), function(k){
-  if(k == 0){
-    paste("Of multiple mapping reads,", round(sum(XA150 == k)/nrow(XA50)*100, digit = 3), "percent are an exact match")
-  }else
-    paste("Of multiple mapping reads,", round(sum(XA50 == k)/nrow(XA150)*100, digit = 3), "percent have an Edit Distance of", k)
-})
+exact <- nrow(stretch100[which(stretch100$`1` == 0 | stretch100$`2` == 0 
+            | stretch100$`3` == 0 | stretch100$`4` == 0 
+            | stretch100$`5` == 0), ])
+paste("Of all 100bp reads", round(exact/nrow(df_100)*100, 3), "percent map to at least 2 sites exactly")
+paste("Of all 100bp multiple mapping reads", round(exact/nrow(multi_df_100)*100, 3), "percent have at least one exact alternate hit")
 
+
+exact <- nrow(stretch150[which(stretch150$`1` == 0 | stretch150$`2` == 0 
+                               | stretch150$`3` == 0 | stretch150$`4` == 0 
+                               | stretch150$`5` == 0), ])
+paste("Of all 150bp reads", round(exact/nrow(df_150)*100, 3), "percent map to at least 2 sites exactly")
+paste("Of all 150bp multiple mapping reads", round(exact/nrow(multi_df_150)*100, 3), "percent have at least one exact alternate hit")
+
+
+####
