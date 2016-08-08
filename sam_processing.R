@@ -76,18 +76,54 @@ stretch50 <- cbind(multi_df_50, XA50)
 stretch100 <- cbind(multi_df_100, XA100)
 stretch150 <- cbind(multi_df_150,XA150)
 
+### Creating final data tables
+##50bp
+test <- stretch50
+test$exact_matches <- rowSums(test[14:18] == 0, na.rm = TRUE)
+test$oneed <- rowSums(test[14:18] == 1, na.rm = TRUE)
+test$twoed <- rowSums(test[14:18] == 2, na.rm = TRUE)
+test$threeed <- rowSums(test[14:18] == 3, na.rm = TRUE)
+test$foured <- rowSums(test[14:18] == 4, na.rm = TRUE)
+test$fiveplused <- rowSums(test[14:18] >= 5, na.rm = TRUE)
+write.table(test, file = "50_data", col.names = TRUE)
+
+##100bp
+
+test <- stretch100
+test$exact_matches <- rowSums(test[14:18] == 0, na.rm = TRUE)
+test$oneed <- rowSums(test[14:18] == 1, na.rm = TRUE)
+test$twoed <- rowSums(test[14:18] == 2, na.rm = TRUE)
+test$threeed <- rowSums(test[14:18] == 3, na.rm = TRUE)
+test$foured <- rowSums(test[14:18] == 4, na.rm = TRUE)
+test$fiveplused <- rowSums(test[14:18] >= 5, na.rm = TRUE)
+write.table(test, file = "100_data", col.names = TRUE)
+
+##150bp
+
+test <- stretch150
+test$exact_matches <- rowSums(test[14:18] == 0, na.rm = TRUE)
+test$oneed <- rowSums(test[14:18] == 1, na.rm = TRUE)
+test$twoed <- rowSums(test[14:18] == 2, na.rm = TRUE)
+test$threeed <- rowSums(test[14:18] == 3, na.rm = TRUE)
+test$foured <- rowSums(test[14:18] == 4, na.rm = TRUE)
+test$fiveplused <- rowSums(test[14:18] >= 5, na.rm = TRUE)
+write.table(test, file = "150_data", col.names = TRUE)
+
+###
+
+### SCRATCH WORK
 
 ### Percentage of multiple site reads with exact match alternative hits
 
 exact <- nrow(stretch50[which(stretch50$`1` == 0 | stretch50$`2` == 0 
-                               | stretch50$`3` == 0 | stretch50$`4` == 0 
-                               | stretch50$`5` == 0), ])
+                              | stretch50$`3` == 0 | stretch50$`4` == 0 
+                              | stretch50$`5` == 0), ])
 paste("Of all 50bp reads", round(exact/nrow(df_50)*100, 3), "percent map to at least 2 sites exactly")
 paste("Of all 50bp multiple mapping reads", round(exact/nrow(multi_df_50)*100, 3), "percent have at least one exact alternate hit")
 
 exact <- nrow(stretch100[which(stretch100$`1` == 0 | stretch100$`2` == 0 
-            | stretch100$`3` == 0 | stretch100$`4` == 0 
-            | stretch100$`5` == 0), ])
+                               | stretch100$`3` == 0 | stretch100$`4` == 0 
+                               | stretch100$`5` == 0), ])
 paste("Of all 100bp reads", round(exact/nrow(df_100)*100, 3), "percent map to at least 2 sites exactly")
 paste("Of all 100bp multiple mapping reads", round(exact/nrow(multi_df_100)*100, 3), "percent have at least one exact alternate hit")
 
@@ -98,5 +134,14 @@ exact <- nrow(stretch150[which(stretch150$`1` == 0 | stretch150$`2` == 0
 paste("Of all 150bp reads", round(exact/nrow(df_150)*100, 3), "percent map to at least 2 sites exactly")
 paste("Of all 150bp multiple mapping reads", round(exact/nrow(multi_df_150)*100, 3), "percent have at least one exact alternate hit")
 
+### Listing percentage of reads with different number of exact matches
+exact <- sum(test$exact_matches == 0)
+paste("of all multiple mapping reads", round(exact/nrow(multi_df_50)*100, 3), "percent do not have alternative sites which are exact matches")
 
-####
+results <- character(0)
+for(i in 1:5){
+  exact <- sum(test$exact_matches == i)
+  results <-c(results, paste("Of all 50 bp reads", round(exact/nrow(df_50)*100,3), "percent map to", i, "alternative sites exactly"))
+  results <-c(results, paste("Of all 50 bp multiple mapping reads", round(exact/nrow(multi_df_50)*100, 3), "percent map to", i, "alternative sites exactly"))
+}
+results
